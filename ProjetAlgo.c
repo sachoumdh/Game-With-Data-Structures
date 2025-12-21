@@ -12,7 +12,7 @@ typedef struct {
     int num_partie;
     char nom_J1 , nom_J2 [20];
     int score_J1 , score_J2;
-}partie;
+} partie;
 
 //Structure P pour stocker les parties 
 typedef struct {
@@ -29,7 +29,7 @@ typedef struct {
 typedef struct {
     Node *Head;
     Node *Tail;
-}File
+} File;
 
 int main(int argc, const char * argv[]) {
     // insert code here...
