@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 //record Joueur
 typedef struct {
@@ -6,6 +7,7 @@ typedef struct {
     char nom[20];
     int score_partie;
     int nb_victoires, nb_defaites, nb_victoires_succ , nb_defaites_succ;
+    bool is_winner;
 } Joueur;
 
 //Record Partie
