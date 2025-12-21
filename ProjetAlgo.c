@@ -20,7 +20,7 @@ typedef struct {
     struct P *Next ;
 } P;
 
-//Node est l'element de la file
+//Node est un element de file et LG , LP
 typedef struct {
     Joueur J;
     struct Node *Jnext;
@@ -30,6 +30,10 @@ typedef struct {
     Node *Head;
     Node *Tail;
 } File;
+
+typedef struct {
+    Node *L;
+}Liste;
 
 int main(int argc, const char * argv[]) {
     // insert code here...
