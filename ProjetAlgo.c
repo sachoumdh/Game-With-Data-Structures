@@ -5,7 +5,7 @@
 typedef struct {
     int num, age;
     char nom[20];
-    int score_partie , points_succesifs;
+    int score_partie , score , points_succesifs;
     int nb_victoires, nb_defaites, nb_victoires_succ , nb_defaites_succ;
     bool is_winner;
 } Joueur;
