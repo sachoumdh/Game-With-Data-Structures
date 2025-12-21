@@ -4,7 +4,7 @@
 typedef struct {
     int num, age;
     char nom[20];
-    int nb_victoires, nb_defaites;
+    int nb_victoires, nb_defaites, nb_victoires_succ , nb_defaites_succ;
 } Joueur;
 
 //Record Partie
@@ -31,6 +31,7 @@ typedef struct {
     Node *Tail;
 } File;
 
+//List
 typedef struct {
     Node *L;
 }Liste;
