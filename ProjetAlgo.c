@@ -143,7 +143,25 @@ bool DeQueue (Queue *F , Player *P)
 }
 
 // ===== Primitive 5: Display the queue ====
-// PAS ENCORE 
+void Display_Queue (Queue F)
+{
+    Node *temp;
+
+    if(EmptyQueue(F))
+    {
+        printf("The queue is empty \n");
+        return;
+    }
+
+    // temp is used to browse the queue without modifying and losing the head
+    temp = F.Head;
+
+    while(temp != NULL)
+    {
+        printf("Player: %s\n", temp->P.name);
+        temp = temp->Pnext; // move to the next element
+    }
+}
 
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
@@ -153,6 +171,9 @@ int main(int argc, const char * argv[])
 
     // Initialization of the queue F
     Init_Queue(&F);
+
+    // Display queue test (empty queue)
+    Display_Queue(F);
 
     // Create players
     Player P1 = {01, 12, "Sarah", 0, 0, 0, 0, 0, 0, 0, false};
@@ -166,10 +187,16 @@ int main(int argc, const char * argv[])
     EnQueue(&F, P3);
     EnQueue(&F, P4);
 
+    // Display queue (players)
+    Display_Queue(F);
+
     // Test DeQueue
+    printf("=== DeQueue ===\n");
     while (DeQueue(&F, &P))
     {
         printf("The player removed is:%s\n", P.name);
+        printf("Queue state: \n");
+        Display_Queue(F); // Display queue state
     }
 
     return 0;
