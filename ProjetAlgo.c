@@ -11,7 +11,6 @@ typedef struct Player{
     int game_score , score , succesifs_points;
     int nb_wins, nb_losses, nb_succ_wins , nb_succ_losses;
     bool is_winner;
-    struct Player *next;
 } Player;
 
 typedef struct Game{
@@ -65,31 +64,33 @@ bool EmptyQueue (Queue F)
 
 }
 
-// ===== Primitive 3: Adding an element to the queue ====
-void EnQueue (Queue *F , Player P)
+// ===== Primitive 3: Adding an element to the queue (at the end) ====
+void EnQueue (Queue *F , Player P1)
 {
-    Player *newP = malloc(sizeof (Player));
-    
+    // Create a new node
+    Node *newP = malloc(sizeof (Node));
      if(newP == NULL)
     {
         printf("Memory allocation error\n");
         return;
     }
 
-    newP->num = P.num;
-    strcpy(newP->name , P.name);
-    newP->age = P.age;
-    newP->game_score = P.game_score;
-    newP->score = P.score;
-    newP->succesifs_points = P.succesifs_points;
-    newP->nb_wins = P.nb_wins;
-    newP->nb_losses = P.nb_losses;
-    newP->nb_succ_wins = P.nb_succ_wins;
-    newP->nb_succ_losses = P.nb_succ_losses;
+    // Put the player's information in the node
+    newP->P.num = P1.num;
+    strcpy(newP->P.name , P1.name);
+    newP->P.age = P1.age;
+    newP->P.game_score = P1.game_score;
+    newP->P.score = P1.score;
+    newP->P.succesifs_points = P1.succesifs_points;
+    newP->P.nb_wins = P1.nb_wins;
+    newP->P.nb_losses = P1.nb_losses;
+    newP->P.nb_succ_wins = P1.nb_succ_wins;
+    newP->P.nb_succ_losses = P1.nb_succ_losses;
     // not sure!!!!
-    newP->is_winner = P.is_winner;
+    newP->P.is_winner = P1.is_winner;
 
-    newP->next = NULL;
+    // The new node becomes the tail
+    newP->Pnext = NULL;
 
     if(F->Tail == NULL) // Empty queue
     {
@@ -104,12 +105,12 @@ void EnQueue (Queue *F , Player P)
 }
 
 // ===== Primitive 4: Delete an element from the queue ====
-void DeQueue (Queue *F , Player *P)
+bool DeQueue (Queue *F , Player *P)
 {
     if(F->Head == NULL) // Empty queue
     {
         printf("Error: queue is empty\n");
-        return;
+        return false;
     }
 
     Node *temp = F->Head; // temp points to the first node in the queue
@@ -138,14 +139,38 @@ void DeQueue (Queue *F , Player *P)
 
     free(temp);
 
+    return true;
 }
 
 // ===== Primitive 5: Display the queue ====
+// PAS ENCORE 
 
+//*******************  MAIN  *****************//
+int main(int argc, const char * argv[])
+{
+    Queue F;
+    Player P;
 
-// main programme
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
+    // Initialization of the queue F
+    Init_Queue(&F);
+
+    // Create players
+    Player P1 = {01, 12, "Sarah", 0, 0, 0, 0, 0, 0, 0, false};
+    Player P2 = {02, 18, "Lyna", 0, 1, 9, 0, 8, 0, 0, true};
+    Player P3 = {03, 20, "You", 1, 2, 3, 0, 0, 0, 0, false};
+    Player P4 = {04, 16, "Me", 0, 1, 0, 0, 8, 7, 6, true};
+
+    // Test EnQueue
+    EnQueue(&F, P1);
+    EnQueue(&F, P2);
+    EnQueue(&F, P3);
+    EnQueue(&F, P4);
+
+    // Test DeQueue
+    while (DeQueue(&F, &P))
+    {
+        printf("The player removed is:%s\n", P.name);
+    }
+
     return 0;
 }
