@@ -40,6 +40,14 @@ typedef struct List {
     Node *L;
 }List;
 
+typedef struct GameState{
+    Queue F , F1 , F3;
+    List LG , LP;
+    G *GameHistory;  //List of all the game rounds
+    Player *currWinner; // the player that won but hasn't moved to F1
+    int totalGames;  // Number of game rounds
+    int Strategy;    //Strategy 1 or 2
+}GameState;
 
 //*******************  THE PRIMITIVES  *****************//
 
@@ -162,6 +170,100 @@ void Display_Queue (Queue F)
         temp = temp->Pnext; // move to the next element
     }
 }
+
+//*********** Game Logic Functions *************//
+
+// Helping function that checks if a Queue has two players
+bool HasTwoPlayers(Queue F) {
+    if (EmptyQueue(F)) return false;
+    return (F.Head->Pnext != NULL);
+}
+
+//function that returns whether there are two players available and chooses them according to Queue priorities
+bool Priority(GameState *g , Player *P1 , Player *P2){
+    
+    //First Check if we have a current winner
+    if (g->currWinner != NULL) {
+            // 1. curr Winner + F1 player
+            if (!EmptyQueue(g->F1)) {
+                *P1 = *(g->currWinner);
+                DeQueue(&g->F1, P2);
+                free(g->currWinner); // free the  currWinner memory
+                g->currWinner = NULL; // set currWinner pointer to NULL
+                return true;
+            }
+            
+            // 2.  curr Winner + F Player
+            if (!EmptyQueue(g->F)) {
+                *P1 = *(g->currWinner);
+                DeQueue(&g->F, P2);
+                free(g->currWinner);
+                g->currWinner = NULL;
+                return true;
+            }
+        
+            // 3. curr Winner + F3 Player
+            if (!EmptyQueue(g->F3)) {
+                *P1 = *(g->currWinner);
+                DeQueue(&g->F3, P2);
+                free(g->currWinner);
+                g->currWinner = NULL;
+                return true;
+            }
+        }
+        
+        // No lastWinner check other combinations
+        
+    // 4. two F1 players
+    if (HasTwoPlayers(g->F1)) {
+        DeQueue(&g->F1, P1);
+        DeQueue(&g->F1, P2);
+        return true;
+    }
+
+    //Priority to F1
+    if (!EmptyQueue(g->F1))  {
+        
+        // 5. F1 player + F player
+        if (!EmptyQueue(g->F)) {
+            DeQueue(&g->F1, P1);
+            DeQueue(&g->F, P2);
+            return true;
+        }
+        // 6. F1 player + F3 player
+        if (EmptyQueue(g->F3)) {
+            DeQueue(&g->F1, P1);
+            DeQueue(&g->F3, P2);
+            return true;
+        }
+    }
+    
+    // 7. two F players
+    if (HasTwoPlayers(g->F)) {
+        DeQueue(&g->F, P1);
+        DeQueue(&g->F, P2);
+        return true;
+    }
+        
+    // 8. F player + F3 player
+    if (!EmptyQueue(g->F) && !EmptyQueue(g->F3)) {
+        DeQueue(&g->F, P1);
+        DeQueue(&g->F3, P2);
+        return true;
+    }
+    
+    // 9. two F3 players
+    if (HasTwoPlayers(g->F3)) {
+        DeQueue(&g->F3, P1);
+        DeQueue(&g->F3, P2);
+        return true;
+    }
+    
+    //No players available
+    printf("No players Available .\n");
+    return false;
+}
+
 
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
