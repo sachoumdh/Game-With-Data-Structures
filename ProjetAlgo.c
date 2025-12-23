@@ -15,7 +15,8 @@ typedef struct Player{
 
 typedef struct Game{
     int num_game;
-    char name_P1 , name_P2 [20];
+    char name_P1 [20];  
+    char name_P2 [20];
     int score_P1 , score_P2;
 } Game;
 
@@ -263,6 +264,86 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
     printf("No players Available .\n");
     return false;
 }
+
+int PlayTurn(int PlayerID , char *PlayerName){
+    int r = rand() % 1000000; // generate random number from 0 to 999999
+    printf("You have generated the value : %d ." , r);
+    // compute the sum of digits
+    int n = r ;
+    int sum = 0;
+    while (n>0){
+        sum += n % 10;
+        n = n/10;
+    }
+    //check if sum of digits is multiple of 5
+    int point;
+    if (sum % 5 == 0){
+         point = 1;
+        printf("The player %d , %s scored a point ! \n" , PlayerID , PlayerName);
+    } else{
+        point = 0;
+        printf("The player %d , %s scored no point :(  \n" , PlayerID , PlayerName);
+    }
+    return point;
+}
+
+//Function that runs a game round and stores the returned game
+Game PlayGame( GameState *g , Player P1 , Player P2){
+    //Start a game round
+    Game game;
+    game.num_game = ++g->totalGames;
+    //store the Players's names
+    strcpy(game.name_P1, P1.name);
+    strcpy(game.name_P2, P2.name);
+    //initialise the players's scores in the game to 0
+    game.score_P1 = 0;
+    game.score_P2 = 0;
+    
+    printf("\nStart of Game %d : Player %d : %s VS Player %d :%s \n", game.num_game,P1.num, P1.name , P2.num , P2.name);
+    
+    int turn = 1;
+    while (turn<= 12 && abs(game.score_P1 - game.score_P2) < 3) {
+        printf ("Beggining of round %d : \n " , turn);
+        // Player 1’s turn
+        printf("%s’s turn: " , P1.name);
+        game.score_P1 += PlayTurn(P1.num, P1.name);
+                
+        printf("Current: %s %d - %d %s\n ", P1.name, game.score_P1, game.score_P2, P2.name);
+                
+        // Check if game should end
+        if (abs(game.score_P1 - game.score_P2) >= 3) {
+            printf("Yay ! Gap of 3 points reached! Game ends.\n ");
+            break;
+        }
+        // Player 2’s turn (if not last turn)
+        if (turn < 12) {
+            printf(" \n%s’s turn: " , P2.name);
+            game.score_P2 += PlayTurn(P2.num, P2.name);
+            printf(" Current: %s %d - %d %s\n ",P1.name, game.score_P1, game.score_P2, P2.name);
+            
+            // Check if game should end
+            if (abs(game.score_P1 - game.score_P2) >= 3) {
+                printf(" 🎯 Gap of 3 points reached! Game ends.\n ");
+                break;
+            }
+        }
+        turn++;
+            }
+        printf("Game Results !! \n ");
+            if (game.score_P1 > game.score_P2) {
+                printf(" THE WINNER IS : %s (P%d)\n ", P1.name, P1.num);
+                printf(" Score: %s %d - %d %s\n ",P1.name, game.score_P1, game.score_P2, P2.name);
+            } else if (game.score_P2 > game.score_P1) {
+                printf(" THE WINNER IS : %s (P%d)\n ", P2.name, P2.num);
+                printf(" Score: %s %d - %d %s\n ",P2.name, game.score_P2, game.score_P1, P1.name);
+            } else {
+                printf (" OH IT'S A TIE !! \n");
+                printf(" Score: %s %d - %d %s\n ",P2.name, game.score_P2, game.score_P1, P1.name);
+                printf("Congratulations to both !");
+            }
+    return game;
+}
+
 
 
 //*******************  MAIN  *****************//
