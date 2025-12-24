@@ -167,9 +167,13 @@ void Display_Queue (Queue F)
 
     while(temp != NULL)
     {
-        printf("Player: %s\n", temp->P.name);
+        // The display is as follows: [ num_Player | name_Player ]
+        printf("[ %d | %s ] -> ",temp->P.num, temp->P.name);
         temp = temp->Pnext; // move to the next element
     }
+
+    // Print NULL at the end of the queue
+    printf("NULL\n");
 }
 
 //*********** Game Logic Functions *************//
