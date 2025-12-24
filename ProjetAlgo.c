@@ -178,6 +178,36 @@ void Display_Queue (Queue F)
 
 //*********** Game Logic Functions *************//
 
+void ADDtoLG(List *LG , Player player){
+    //Allocate new node and fill it with player
+    Node *new = malloc(sizeof(Node));
+    new->P = player;
+    
+    //since LG is ordered
+    //if LG's Head = NIL or score is superior than the first element's score : new becomes head of list
+    if(LG->L == NULL || player.score > LG->L->P.score){
+        new->Pnext = LG->L;
+        LG->L = new;
+    } else{
+        //we insert player in its order
+        Node *Q = LG->L;
+        while(Q->Pnext != NULL && Q->Pnext->P.score >= player.score){
+            //move pointer Q to apropriate order
+            Q = Q->Pnext;
+        }
+        new->Pnext = Q->Pnext;
+        Q->Pnext = new;
+    }
+}
+
+void ADDtoLP(List *LP , Player player){
+    //since LP is not ordered we add element at the head and it becomes the head
+    Node *new = malloc(sizeof(Node));
+    new->P = player;
+    new->Pnext = LP->L;
+    LP->L = new;
+}
+
 // Helping function that checks if a Queue has two players
 bool HasTwoPlayers(Queue F) {
     if (EmptyQueue(F)) return false;
@@ -189,40 +219,39 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
     
     //First Check if we have a current winner
     if (g->currWinner != NULL) {
+        *P1 = (*g->currWinner); // we copy currwinner Data
             // 1. curr Winner + F1 player
             if (!EmptyQueue(g->F1)) {
-                *P1 = *(g->currWinner);
                 DeQueue(&g->F1, P2);
-                free(g->currWinner); // free the  currWinner memory
-                g->currWinner = NULL; // set currWinner pointer to NULL
+                printf("Players chosen : Current Winner + F1 Player");
                 return true;
             }
             
             // 2.  curr Winner + F Player
             if (!EmptyQueue(g->F)) {
-                *P1 = *(g->currWinner);
                 DeQueue(&g->F, P2);
-                free(g->currWinner);
-                g->currWinner = NULL;
+                printf("Players chosen : Current Winner + F Player");
                 return true;
             }
         
             // 3. curr Winner + F3 Player
             if (!EmptyQueue(g->F3)) {
-                *P1 = *(g->currWinner);
-                DeQueue(&g->F3, P2);
-                free(g->currWinner);
-                g->currWinner = NULL;
+                DeQueue(&g->F, P2);
+                printf("Players chosen : Current Winner + F3 Player");
                 return true;
             }
+        // if no player with current winner , game cannot proceed
+        printf("Pairing with current winner impossible .");
+        return false;
         }
         
-        // No lastWinner check other combinations
+    // No current winner , we check other combinations
         
     // 4. two F1 players
     if (HasTwoPlayers(g->F1)) {
         DeQueue(&g->F1, P1);
         DeQueue(&g->F1, P2);
+        printf("Players chosen : F1 player + F1 Player");
         return true;
     }
 
@@ -233,12 +262,14 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
         if (!EmptyQueue(g->F)) {
             DeQueue(&g->F1, P1);
             DeQueue(&g->F, P2);
+            printf("Players chosen : F1 player + F Player");
             return true;
         }
         // 6. F1 player + F3 player
         if (EmptyQueue(g->F3)) {
             DeQueue(&g->F1, P1);
             DeQueue(&g->F3, P2);
+            printf("Players chosen : F1 player + F3 Player");
             return true;
         }
     }
@@ -247,6 +278,7 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
     if (HasTwoPlayers(g->F)) {
         DeQueue(&g->F, P1);
         DeQueue(&g->F, P2);
+        printf("Players chosen : F player + F Player");
         return true;
     }
         
@@ -254,6 +286,7 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
     if (!EmptyQueue(g->F) && !EmptyQueue(g->F3)) {
         DeQueue(&g->F, P1);
         DeQueue(&g->F3, P2);
+        printf("Players chosen : F player + F3 Player");
         return true;
     }
     
@@ -261,6 +294,7 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
     if (HasTwoPlayers(g->F3)) {
         DeQueue(&g->F3, P1);
         DeQueue(&g->F3, P2);
+        printf("Players chosen : F3 player + F3 Player");
         return true;
     }
     
@@ -268,6 +302,7 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
     printf("No players Available .\n");
     return false;
 }
+
 
 int PlayTurn(int PlayerID , char *PlayerName){
     int r = rand() % 1000000; // generate random number from 0 to 999999
@@ -348,6 +383,209 @@ Game PlayGame( GameState *g , Player P1 , Player P2){
     return game;
 }
 
+void Update_P_Stats(Player *winner , Player *loser){
+    //Updates the stats of the players at end of game round
+    winner->nb_wins++;
+    winner->nb_succ_wins++;
+    winner->nb_succ_losses = 0;
+    
+    loser->nb_losses++;
+    loser->nb_succ_losses++;
+    loser->nb_succ_wins = 0;
+}
+
+void MovePlayer(GameState *g , Player *P){
+    
+    //First check if the player is actuallythe current winner
+    bool isCurrWinner = (g->currWinner != NULL && g->currWinner->num == P->num);
+    
+    if (P->is_winner){
+        //we check if Player has 5 or more total wins
+        if (P->nb_wins >= 5){
+            //Player goes to LG
+            printf("Yahoo ! Winner %d , %s is a definitive winner ! -> Goes to Winners List and exempt from playing .\n", P->num,P->name);
+            if (isCurrWinner){
+                ADDtoLG(&g->LG, *(g->currWinner));
+                free(g->currWinner);
+                g->currWinner = NULL;
+            }else{ //we create a copy in LG
+                ADDtoLG(&g->LG,*P);
+            }
+            return;
+        }
+        // check if 3 consecutive wins
+        if (P->nb_succ_wins >= 3){
+            printf("Winner %d , %s won 3 times in a row ! -> Goes to F1 . \n", P->num , P->name);
+            if (isCurrWinner){
+                //Move currWinner to F1
+                EnQueue(&g->F1, *(g->currWinner));
+                free(g->currWinner);
+                g->currWinner = NULL;
+            } else { //Move the Queue Player to F1
+                EnQueue(&g->F1 , *P);
+            }
+            return;
+        } else{
+            //The player becomes the currWinner
+            printf("Winner %d , %s becomes the curr winner and will play next round ." , P->num , P ->name);
+            if(!isCurrWinner){
+              //if exists , we free previous currWinner
+                if (g->currWinner != NULL){
+                    free(g->currWinner);
+                }
+                //we allocate new currWinner and copy player data
+                g->currWinner = malloc(sizeof(Player));
+                if (g->currWinner != NULL){
+                    *(g->currWinner) = *P;
+                }
+            }
+        }
+    } else{    //The player lost
+        // we check for 5 total losses first
+        if (P->nb_losses >= 5){
+            printf("Ayyy player %d , %s is a definitive loser :( -> Goes to Losers List and exempt from playing .\n", P->num,P->name);
+            if(isCurrWinner){ //the last current winner lost
+                ADDtoLP(&g->LP, *(g->currWinner)); // we move him to LP
+                free(g->currWinner);
+                g->currWinner = NULL ;
+            } else { //move the queue Player to LP
+                ADDtoLP(&g->LP, *P);
+            }
+            return;
+        }
+        // Check for 3 or more total losses (consecutive losses included
+        if (P->nb_losses >= 3){
+            printf("Player %d , %s lost 3 or more times  -> Goes to F3 . \n", P->num , P->name);
+            if (isCurrWinner){
+                EnQueue(&g->F3, *(g->currWinner));
+                free(g->currWinner);
+                g->currWinner = NULL;
+            } else{
+                EnQueue(&g->F3 , *P);
+            }
+            return;
+            
+        } else {  // The player returns to F Queue
+            printf("The player %d , %s  -> goes to F Queue . \n" , P->num , P->name);
+            if(isCurrWinner){
+                EnQueue(&g->F, *(g->currWinner));
+                free(g->currWinner);
+                g->currWinner = NULL;
+            } else{
+                EnQueue(&g->F, *P);
+            }
+        }
+    }
+}
+
+//function to process the game round results
+void GameResults( GameState *g , Game game , Player *P1 , Player *P2){
+    P1->game_score = game.score_P1;
+    P2->game_score = game.score_P2;
+    P1->score += game.score_P1;
+    P2->score += game.score_P2;
+    
+    printf("\n  Game Results ! \n");
+    
+    if (game.score_P1 > game.score_P2){
+        // P1 wins and P2 loses
+        P1->is_winner = true ;
+        P2->is_winner = false;
+        
+        printf("Player %d , %s Wins : %d-%d \n" , P1->num , P1->name , game.score_P1 , game.score_P2);
+        
+        //update player stats
+        Update_P_Stats(P1, P2);
+        
+        //moving players to appropriate Lists and Queues
+        printf("Let's place the players !\n");
+        MovePlayer(g, P1);
+        MovePlayer(g, P2);
+    } else if (game.score_P2 > game.score_P1){
+        // P2 wins and P1 loses
+        P2->is_winner = true ;
+        P1->is_winner = false;
+        
+        printf("Player %d , %s Wins : %d-%d \n" , P2->num , P2->name , game.score_P2 , game.score_P1);
+        
+        //update player stats
+        Update_P_Stats(P2, P1);
+        
+        //moving players to appropriate Lists and Queues
+        printf("Let's place the players !\n");
+        MovePlayer(g, P2);
+        MovePlayer(g, P1);
+    } else {
+        // it's a tie , both don't win nor lose
+        printf("It's a tie ! : %d-%d \n" ,game.score_P2 , game.score_P1);
+        P1->is_winner = false;
+        P2->is_winner = false;
+        
+        P1->nb_succ_wins = 0;
+        P1->nb_succ_losses = 0;
+        P2->nb_succ_wins = 0;
+        P2->nb_succ_losses = 0;
+        
+        //Moving both players to F
+        printf("Both players return to F . \n");
+        EnQueue(&g->F, *P1);
+        EnQueue(&g->F, *P2);
+        
+        //clear the currWinner since it's a tie
+        if(g->currWinner != NULL && (g->currWinner->num == P1->num || g->currWinner->num == P2->num )){
+            free(g->currWinner);
+            g->currWinner = NULL;
+            printf("No current winner :/ \n");
+        }
+    }
+}
+
+//function to display state of game after round
+void DisplayGameState ( GameState *g){
+    printf("\n Current Game State : \n");
+    
+    printf("Total games played : %d | Strategy : %d \n", g->totalGames , g->Strategy);
+    
+    //We display the different queues
+    Display_Queue(g->F);
+    Display_Queue(g->F1);
+    Display_Queue(g->F3);
+    
+    //Display the current Winner
+    printf("The current Winner is : \n");
+    if(g->currWinner == NULL){
+        printf("No current winner .\n");
+    } else {
+        printf("Player %d , %s , Wins : %d ,Consecutive wins : %d, Losses : %d , Consecutive losses : %d ,game score : %d , score : %d" , g->currWinner->num,g->currWinner->name , g->currWinner->nb_wins,g->currWinner->nb_succ_wins,g->currWinner->nb_losses,g->currWinner->nb_succ_losses,g->currWinner->game_score, g->currWinner->score);
+    }
+    
+    //Display the lists
+    printf("The winners list : \n");
+    if(g->LG.L == NULL ){
+        printf("Empty.\n");
+    } else{
+        Node *Q = g->LG.L;
+        int i = 1;
+        while (Q != NULL) {
+            Player p = Q->P;
+            printf("%d. Player %d , %s  Age : %d | score : %d | Wins : ‰d | Losses : %d", i ,p.num,p.name,p.age ,p.score, p.nb_wins, p.nb_losses);
+            Q = Q->Pnext;
+        }
+    }
+    
+    printf("The losers list : \n");
+    if(g->LP.L == NULL ){
+        printf("Empty.\n");
+    } else{
+        Node *Q = g->LP.L;
+        int i = 1;
+        while (Q != NULL) {
+            Player p = Q->P;
+            printf("%d. Player %d , %s  Age : %d | score : %d | Wins : ‰d | Losses : %d", i++ ,p.num,p.name,p.age ,p.score, p.nb_wins , p.nb_losses);
+            Q = Q->Pnext;
+        }
+    }
+}
 
 
 //*******************  MAIN  *****************//
