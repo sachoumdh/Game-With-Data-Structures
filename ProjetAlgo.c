@@ -48,6 +48,7 @@ typedef struct GameState{
     Player *currWinner; // the player that won but hasn't moved to F1
     int totalGames;  // Number of game rounds
     int Strategy;    //Strategy 1 or 2
+    int totalPlayers; //total Players of the game
 }GameState;
 
 //*******************  THE PRIMITIVES  *****************//
@@ -176,6 +177,11 @@ void Display_Queue (Queue F)
     printf("NULL\n");
 }
 
+
+// Function to initialise List
+void Init_List(List *L){
+    L->L = NULL;
+}
 //*********** Game Logic Functions *************//
 
 void ADDtoLG(List *LG , Player player){
@@ -587,6 +593,129 @@ void DisplayGameState ( GameState *g){
     }
 }
 
+//function to create the initial queue F of players (to avoid keyboard input)
+void CreateF(Queue *F , int n ){
+    //field of name strings
+    char *names[15] = {
+        "Sarah" , "Lyna" , "Amine" , "Imene" , "Karim" , "Mehdi" , "Elias" , "Anais" ,"Maissa" , "Adam" , "Nazim" , "Racim " ,"Ramy" , "Farida" , "Meriem"
+    };
+    Player p;
+    
+    for(int i=0; i < n ; i++){
+        strcpy(p.name, names[i%15]);//copy from the field of names above
+        p.num = i + 1;
+        p.age = 18 + rand() % 83 ;// assigns the players a random age between 18 and 100
+        p.game_score = 0;
+        p.score = 0;
+        p.nb_losses = 0;
+        p.nb_wins = 0;
+        p.nb_succ_losses = 0;
+        p.nb_succ_wins = 0;
+        p.is_winner = false;
+
+        EnQueue(F , p);
+    }
+}
+
+//Function to determine whether the game ends (ends once all players in LG or LP)
+bool FinishedGame(GameState *g){
+    int ListedPlayers = 0; // counter
+    // Compute players in LG
+    Node *Q = g->LG.L;
+    while (Q != NULL) {
+        ListedPlayers++;
+        Q = Q->Pnext;
+    }
+    //Compute players in LP
+    Q = g->LP.L;
+    while (Q != NULL) {
+        ListedPlayers++;
+        Q = Q->Pnext;
+    }
+    return (ListedPlayers == g->totalPlayers);
+}
+
+//game 1 loop function
+void PlayGameStrat1(GameState *g , int nbrPlayers){
+    
+    printf("\n  Start Game Strategy 1 !!  \n");
+    printf("Number of players : %d \n" , nbrPlayers);
+    
+    CreateF(&g->F , nbrPlayers);
+    
+    printf("Initial State of the game : \n");
+    DisplayGameState(g);
+    
+    //Game loops until all players are in LG and LP hence all Queues Empty And a currWinner is ongoing
+    while(!FinishedGame(g) && (!EmptyQueue(g->F) || !EmptyQueue(g->F1) || !EmptyQueue(g->F3) || g->currWinner != NULL)){
+       
+        Player P1 , P2 ; // each game round has 2 players
+        if(Priority(g, &P1, &P2)){
+            Game game = GameRound(g, P1, P2);
+            GameResults(g, game, &P1, &P2);
+            //store the game round in the game List
+            G *gameH = malloc(sizeof(G));
+            gameH->round = game;
+            gameH->Next = g->GameHistory;
+            g->GameHistory = gameH;
+            //Display State of game after each round
+            DisplayGameState(g);
+        } else{  //NO players available (Priority returns False)
+            
+            if (g->currWinner != NULL){   //last player moves to F1
+                printf("No opponent for current Winner %d , %s -> Player moved to F1\n" , g->currWinner->num, g->currWinner->name);
+                EnQueue(&g->F1, *(g->currWinner));
+                free(g->currWinner); //free the currWinner memory
+                g->currWinner = NULL;
+            }
+            //last player in F3 moves to LP
+            if (!EmptyQueue(g->F3) && EmptyQueue(g->F) && EmptyQueue(g->F1) && g->currWinner == NULL){
+                Player lastPlayer;
+                DeQueue(&g->F3, &lastPlayer);
+                printf("Last Player in F3 %d , %s -> moves to F3\n" , lastPlayer.num,lastPlayer.name);
+            }
+            break;
+        }
+    }
+    
+    printf("\n\n    End of Game Strat 1     \n");
+    printf("Total game rounds played : %d \n", g->totalGames);
+    
+    //Move remaining players to appropriate lists
+    if (g->currWinner != NULL){
+        if(g->currWinner->nb_wins >= 5) { //Move currWinner to LG if total wins >= 5
+            ADDtoLG(&g->LG, *(g->currWinner));
+        } else { // Player belongs in F1
+            EnQueue(&g->F1, *(g->currWinner));
+        } //free currWinner memory
+        free (g->currWinner);
+        g->currWinner = NULL;
+    }
+    //Move last F1 players to LG
+    while(!EmptyQueue(g->F1)){
+        Player p;
+        DeQueue(&g->F1, &p);
+        ADDtoLG(&g->LG, p);
+    }
+    //Move last F players to LP
+    while(!EmptyQueue(g->F)){
+        Player p;
+        DeQueue(&g->F, &p);
+        ADDtoLP(&g->LP, p);
+    }
+    //Move last F3 players to LP
+    while(!EmptyQueue(g->F3)){
+        Player p;
+        DeQueue(&g->F3, &p);
+        ADDtoLP(&g->LP, p);
+    }
+    
+    printf("     END OF GAME PART I RESULTS :     \n");
+    //DisplayTop3Winners(g->LG , 3);
+    
+    //DisplayWorst
+    //Display rest idk
+}
 
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
@@ -623,6 +752,20 @@ int main(int argc, const char * argv[])
         printf("Queue state: \n");
         Display_Queue(F); // Display queue state
     }
+
+    GameState g;
+    Init_Queue(&g.F);
+    Init_Queue(&g.F1);
+    Init_Queue(&g.F3);
+    g.GameHistory = NULL;
+    g.totalGames = 0;
+    g.currWinner = NULL;
+    g.totalGames = 0;
+    g.Strategy = 1;
+    Init_List(&g.LG);
+    Init_List(&g.LP);
+    
+    PlayGameStrat1(&g, 2);
 
     return 0;
 }
