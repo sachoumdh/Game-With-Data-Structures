@@ -327,7 +327,7 @@ int PlayTurn(int PlayerID , char *PlayerName){
 }
 
 //Function that runs a game round and stores the returned game
-Game PlayGame( GameState *g , Player P1 , Player P2){
+Game GameRound( GameState *g , Player P1 , Player P2){
     //Start a game round
     Game game;
     game.num_game = ++g->totalGames;
