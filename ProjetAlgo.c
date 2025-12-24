@@ -738,6 +738,46 @@ void PlayGameStrat1(GameState *g , int nbrPlayers){
     //Display rest idk
 }
 
+// Function display the players who have not won any games
+void Display_No_Wins_Players (Queue *F)
+{
+    Queue temp;
+    Player P;
+    bool found = false;
+
+    Init_Queue(&temp);
+
+    printf("Players with zero wins are: \n");
+
+    // Browse queue F and display the players who have no wins
+    // 1st case : players with 0 wins 
+    while (!EmptyQueue(*F))
+    {
+        DeQueue(F,&P);
+
+        if (P.nb_wins == 0)
+        {
+            printf("- %s\n", P.name);
+            found = true;
+        }
+
+        EnQueue(&temp,P);
+    }
+
+    // Put the elements from the temp queue back into queue F to return to the initial state
+    while (!EmptyQueue(temp))
+    {
+        DeQueue(&temp,&P);
+        EnQueue(F,P);
+    }
+
+    // 2nd case : no player has 0 wins
+    if (!found)
+    {
+        printf("No player has 0 wins! \n");
+    }
+}
+
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
 {
@@ -751,10 +791,29 @@ int main(int argc, const char * argv[])
     Display_Queue(F);
 
     // Create players
-    Player P1 = {01, 12, "Sarah", 0, 0, 0, 0, 0, 0, 0, false};
-    Player P2 = {02, 18, "Lyna", 0, 1, 9, 0, 8, 0, 0, true};
-    Player P3 = {03, 20, "You", 1, 2, 3, 0, 0, 0, 0, false};
-    Player P4 = {04, 16, "Me", 0, 1, 0, 0, 8, 7, 6, true};
+    Player P1 = {1, 12, "Sarah", // num , age , name 
+             0, 0, 0,      // game_score, score, succesifs_points
+             2, 2,         // nb_wins, nb_losses
+             0, 1,         // nb_succ_wins, nb_succ_losses
+             false};       // is_winner
+
+    Player P2 = {2, 18, "Lyna",
+             10, 25, 3,
+             2, 1,
+             1, 0,
+             true};
+
+    Player P3 = {2, 18, "Me",
+             10, 25, 3,
+             2, 1,
+             1, 0,
+             true};
+
+    Player P4 = {2, 18, "You",
+             10, 25, 3,
+             2, 1,
+             1, 0,
+             true};
 
     // Test EnQueue
     EnQueue(&F, P1);
