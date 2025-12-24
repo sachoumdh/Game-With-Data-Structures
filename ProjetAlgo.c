@@ -635,6 +635,27 @@ bool FinishedGame(GameState *g){
     return (ListedPlayers == g->totalPlayers);
 }
 
+//function to display top 3 winners at end of game
+void DisplayTop3Winners(List LG ){
+    printf ("\nThe top 3 winners of the game are : \n");
+    printf("_____________________________________");
+    printf("*drumroll Please*");
+    
+    if(LG.L == NULL ){ // list of winners is empty
+        printf("No winners yet ! \n");
+        return;
+    }
+    Node *Q = LG.L;
+    int i = 0;
+    
+    while (Q != NULL && i <= 3) {
+        Player p = Q->P;
+        printf("%d.Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n ", i+1,p.num,p.name,p.age,p.score,p.nb_wins,p.nb_losses);
+        Q = Q->Pnext;
+        i++;
+    }
+}
+
 //game 1 loop function
 void PlayGameStrat1(GameState *g , int nbrPlayers){
     
@@ -711,7 +732,7 @@ void PlayGameStrat1(GameState *g , int nbrPlayers){
     }
     
     printf("     END OF GAME PART I RESULTS :     \n");
-    //DisplayTop3Winners(g->LG , 3);
+    DisplayTop3Winners(g->LG);
     
     //DisplayWorst
     //Display rest idk
