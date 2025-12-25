@@ -737,7 +737,48 @@ void PlayGameStrat1(GameState *g , int nbrPlayers){
     //Display rest idk
 }
 
-// Function to display n wins from LG and LP (End of Game)
+// Function to display n winners from LG and LP (End of Game)
+void Display_N_Wins (List * LG, List * LP , int n)
+{
+    Node * current;
+
+    // There is no element in the list LG and LP
+    if ( (LG->L == NULL) && (LP->L == NULL) )
+    {
+        printf("There is no player in the lists LG and LP\n");
+        return;
+    }
+
+    // Create pointer to browse the list without losing the head
+    current = LG->L;
+
+    printf("Players with %d win(s) in the list LG:\n", n);
+    while (current != NULL)
+    {
+        if (current->P.nb_wins > n){
+            printf("No player in LG with %d number of wins !", n );
+            break;
+        }
+        if(current->P.nb_wins == n)
+        {
+            printf("Player: %s, Wins: %d\n", current->P.name, current->P.nb_wins);
+        }
+
+        current = current->Pnext;
+    }
+
+    current = LP->L;
+    printf("Players with %d wins in the list LP:\n" , n);
+    while (current != NULL)
+    {
+        if(current->P.nb_wins == n)
+        {
+            printf("Player: %s, Wins: %d\n", current->P.name, current->P.nb_wins);
+        }
+
+        current = current->Pnext;
+    }
+}
 
 // Function to display n losses from LG and LP (End of Game)
 void Display_N_Losses (List * LG, List * LP , int n)
