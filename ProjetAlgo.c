@@ -647,11 +647,54 @@ void DisplayTop3Winners(List LG ){
     Node *Q = LG.L;
     int i = 0;
     
-    while (Q != NULL && i <= 3) {
+    while (Q != NULL && i < 3) {
         Player p = Q->P;
         printf("%d.Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n ", i+1,p.num,p.name,p.age,p.score,p.nb_wins,p.nb_losses);
         Q = Q->Pnext;
         i++;
+    }
+}
+
+// Function to display n winners from LG and LP (End of Game)
+void Display_N_Wins (List * LG, List * LP , int n)
+{
+    Node * current;
+
+    // There is no element in the list LG and LP
+    if ( (LG->L == NULL) && (LP->L == NULL) )
+    {
+        printf("There is no player in the lists LG and LP\n");
+        return;
+    }
+
+    // Create pointer to browse the list without losing the head
+    current = LG->L;
+
+    printf("\nPlayers with %d win(s) in the list LG:\n", n);
+    while (current != NULL)
+    {
+        if (current->P.nb_wins > n){
+            printf("No player in LG with %d number of wins !", n );
+            break;
+        }
+        if(current->P.nb_wins == n)
+        {
+            printf("Player: %s, Wins: %d\n", current->P.name, current->P.nb_wins);
+        }
+
+        current = current->Pnext;
+    }
+
+    current = LP->L;
+    printf("\nPlayers with %d wins in the list LP:\n" , n);
+    while (current != NULL)
+    {
+        if(current->P.nb_wins == n)
+        {
+            printf("Player: %s, Wins: %d\n", current->P.name, current->P.nb_wins);
+        }
+
+        current = current->Pnext;
     }
 }
 
@@ -731,97 +774,14 @@ void PlayGameStrat1(GameState *g , int nbrPlayers){
     }
     
     printf("     END OF GAME PART I RESULTS :     \n");
-    DisplayTop3Winners(g->LG);
-    
-    //DisplayWorst
-    //Display rest idk
+    DisplayTop3Winners(g->LG); //Display the top 3 winners at end of game
+    Display_N_Wins(&g->LG, &g->LP, 0);  //Display players with no wins
+    Display_N_Wins(&g->LG, &g->LP, 1);  //Display players with 1 win
+    Display_N_Wins(&g->LG, &g->LP, 2);  //Display players with 2 win
+    Display_N_Wins(&g->LG, &g->LP, 3);  //Display players with 3 win
 }
 
-// Function to display n winners from LG and LP (End of Game)
-void Display_N_Wins (List * LG, List * LP , int n)
-{
-    Node * current;
 
-    // There is no element in the list LG and LP
-    if ( (LG->L == NULL) && (LP->L == NULL) )
-    {
-        printf("There is no player in the lists LG and LP\n");
-        return;
-    }
-
-    // Create pointer to browse the list without losing the head
-    current = LG->L;
-
-    printf("Players with %d win(s) in the list LG:\n", n);
-    while (current != NULL)
-    {
-        if (current->P.nb_wins > n){
-            printf("No player in LG with %d number of wins !", n );
-            break;
-        }
-        if(current->P.nb_wins == n)
-        {
-            printf("Player: %s, Wins: %d\n", current->P.name, current->P.nb_wins);
-        }
-
-        current = current->Pnext;
-    }
-
-    current = LP->L;
-    printf("Players with %d wins in the list LP:\n" , n);
-    while (current != NULL)
-    {
-        if(current->P.nb_wins == n)
-        {
-            printf("Player: %s, Wins: %d\n", current->P.name, current->P.nb_wins);
-        }
-
-        current = current->Pnext;
-    }
-}
-
-// Function to display n losses from LG and LP (End of Game)
-void Display_N_Losses (List * LG, List * LP , int n)
-{
-    Node * current;
-
-    // There is no element in the list LG and LP
-    if ( (LG->L == NULL) && (LP->L == NULL) )
-    {
-        printf("There is no player in the lists LG and LP\n");
-        return;
-    }
-
-    // Create pointer to browse the list without losing the head
-    current = LP->L;
-
-    printf("Players with %d loss(es) in the list LG:\n", n);
-    while (current != NULL)
-    {
-        if (current->P.nb_losses > n){
-            printf("No player in LP with %d number of losses !", n );
-            break;
-        }
-        if(current->P.nb_losses == n)
-        {
-            printf("Player: %s, losses: %d\n", current->P.name, current->P.nb_losses);
-        }
-
-        current = current->Pnext;
-    }
-
-    current = LG->L;
-    printf("Players with %d losses in the list LG:\n" , n);
-    while (current != NULL)
-    {
-        if(current->P.nb_losses == n)
-        {
-            printf("Player: %s, Losses: %d\n", current->P.name, current->P.nb_losses);
-        }
-
-        current = current->Pnext;
-    }
-}
 
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
