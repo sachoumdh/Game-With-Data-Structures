@@ -778,6 +778,49 @@ void Display_No_Wins_Players (Queue *F)
     }
 }
 
+// Function to display n losses from LG and LP (End of Game)
+void Display_N_Losses (List * LG, List * LP , int n)
+{
+    Node * current;
+
+    // There is no element in the list LG and LP
+    if ( (LG->L == NULL) && (LP->L == NULL) )
+    {
+        printf("There is no player in the lists LG and LP\n");
+        return;
+    }
+
+    // Create pointer to browse the list without losing the head
+    current = LP->L;
+
+    printf("Players with %d loss(es) in the list LG:\n", n);
+    while (current != NULL)
+    {
+        if (current->P.nb_losses > n){
+            printf("No player in LP with %d number of losses !", n );
+            break;
+        }
+        if(current->P.nb_losses == n)
+        {
+            printf("Player: %s, losses: %d\n", current->P.name, current->P.nb_losses);
+        }
+
+        current = current->Pnext;
+    }
+
+    current = LG->L;
+    printf("Players with %d losses in the list LG:\n" , n);
+    while (current != NULL)
+    {
+        if(current->P.nb_losses == n)
+        {
+            printf("Player: %s, Losses: %d\n", current->P.name, current->P.nb_losses);
+        }
+
+        current = current->Pnext;
+    }
+}
+
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
 {
