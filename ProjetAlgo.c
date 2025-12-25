@@ -826,7 +826,80 @@ void PlayGameStrat1(GameState *g , int nbrPlayers){
     Display_N_Losses(&g->LG, &g->LP, 3);
 }
 
+//*******************  LOGIC GAME 2ND PART *****************//
 
+// Recursive function that calculates the GCD of two numbers
+int GCD (int a , int b)
+{
+    if (b == 0)
+    {
+       return a;
+    }
+    else
+    {
+        return GCD(b, a%b);
+    }
+}
+
+// Function that checks if the number contains a digit
+bool number_contains_digit (int number, int digit)
+{
+    while (number > 0)
+    {
+        if ( (number % 10) == digit )
+        {
+            return true;
+        }
+
+        number = number / 10;
+    }
+
+    return false;
+}
+
+
+// Function to start the second strategy
+int PlayTurn2(int PlayerID , char *PlayerName)
+{
+    int n;
+    int digit;
+    int point;
+    bool find = false;
+
+    int a = rand() % 1000000; // generate 1st random number from 0 to 999999
+    int b = rand() % 1000000; // generate 2nd random number from 0 to 999999
+
+    printf("You have generated the values: %d and %d .\n", a, b);
+
+    // compute the GCD of a and b
+    n = GCD(a, b);
+
+    // check if the GCD contains at least one digit that belongs to one of the numbers a or b
+    while ( (n>0) && (find == false) )
+    {
+        digit = n % 10;
+
+        if ( (number_contains_digit(a, digit)) || (number_contains_digit(b, digit)) )
+        {
+            find = true;
+        }
+
+        n = n / 10;
+    }
+
+    if (find == true)
+    {
+        point = 1;
+        printf("The player %d , %s scored a point ! \n" , PlayerID , PlayerName);
+    }
+    else
+    {
+        point = 0;
+        printf("The player %d , %s scored no point :(  \n" , PlayerID , PlayerName);
+    }
+
+    return point;
+}
 
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
