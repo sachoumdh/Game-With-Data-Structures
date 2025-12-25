@@ -71,7 +71,6 @@ bool EmptyQueue (Queue F)
     {
         return false;
     }
-
 }
 
 // ===== Primitive 3: Adding an element to the queue (at the end) ====
@@ -177,11 +176,11 @@ void Display_Queue (Queue F)
     printf("NULL\n");
 }
 
-
 // Function to initialise List
 void Init_List(List *L){
     L->L = NULL;
 }
+
 //*********** Game Logic Functions *************//
 
 void ADDtoLG(List *LG , Player player){
@@ -220,7 +219,7 @@ bool HasTwoPlayers(Queue F) {
     return (F.Head->Pnext != NULL);
 }
 
-//function that returns whether there are two players available and chooses them according to Queue priorities
+// Function that returns whether there are two players available and chooses them according to Queue priorities
 bool Priority(GameState *g , Player *P1 , Player *P2){
     
     //First Check if we have a current winner
@@ -484,7 +483,7 @@ void MovePlayer(GameState *g , Player *P){
     }
 }
 
-//function to process the game round results
+// Function to process the game round results
 void GameResults( GameState *g , Game game , Player *P1 , Player *P2){
     P1->game_score = game.score_P1;
     P2->game_score = game.score_P2;
@@ -546,7 +545,7 @@ void GameResults( GameState *g , Game game , Player *P1 , Player *P2){
     }
 }
 
-//function to display state of game after round
+// Function to display state of game after round
 void DisplayGameState ( GameState *g){
     printf("\n Current Game State : \n");
     
@@ -593,7 +592,7 @@ void DisplayGameState ( GameState *g){
     }
 }
 
-//function to create the initial queue F of players (to avoid keyboard input)
+// Function to create the initial queue F of players (to avoid keyboard input)
 void CreateF(Queue *F , int n ){
     //field of name strings
     char *names[15] = {
@@ -617,7 +616,7 @@ void CreateF(Queue *F , int n ){
     }
 }
 
-//Function to determine whether the game ends (ends once all players in LG or LP)
+// Function to determine whether the game ends (ends once all players in LG or LP)
 bool FinishedGame(GameState *g){
     int ListedPlayers = 0; // counter
     // Compute players in LG
@@ -738,45 +737,7 @@ void PlayGameStrat1(GameState *g , int nbrPlayers){
     //Display rest idk
 }
 
-// Function display the players who have not won any games
-void Display_No_Wins_Players (Queue *F)
-{
-    Queue temp;
-    Player P;
-    bool found = false;
-
-    Init_Queue(&temp);
-
-    printf("Players with zero wins are: \n");
-
-    // Browse queue F and display the players who have no wins
-    // 1st case : players with 0 wins 
-    while (!EmptyQueue(*F))
-    {
-        DeQueue(F,&P);
-
-        if (P.nb_wins == 0)
-        {
-            printf("- %s\n", P.name);
-            found = true;
-        }
-
-        EnQueue(&temp,P);
-    }
-
-    // Put the elements from the temp queue back into queue F to return to the initial state
-    while (!EmptyQueue(temp))
-    {
-        DeQueue(&temp,&P);
-        EnQueue(F,P);
-    }
-
-    // 2nd case : no player has 0 wins
-    if (!found)
-    {
-        printf("No player has 0 wins! \n");
-    }
-}
+// Function to display n wins from LG and LP (End of Game)
 
 // Function to display n losses from LG and LP (End of Game)
 void Display_N_Losses (List * LG, List * LP , int n)
