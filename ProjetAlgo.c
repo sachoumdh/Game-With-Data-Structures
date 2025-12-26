@@ -343,7 +343,15 @@ Game GameRound( GameState *g , Player P1 , Player P2){
     game.score_P1 = 0;
     game.score_P2 = 0;
     
+    printf("  \n"); // for space
     printf("\nStart of Game %d : Player %d : %s VS Player %d :%s \n", game.num_game,P1.num, P1.name , P2.num , P2.name);
+    printf("  \n"); // for space
+
+    // print the date and time 
+    printf("The game has started ");
+    Display_Time();
+
+    printf("  \n"); // for space
     
     int turn = 1;
     while (turn<= 12 && abs(game.score_P1 - game.score_P2) < 3) {
