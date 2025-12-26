@@ -901,6 +901,18 @@ int PlayTurn2(int PlayerID , char *PlayerName)
     return point;
 }
 
+// Function to Display the start date and end date of the game
+void Display_Time ()
+{
+    time_t t = time(NULL);
+
+    // this function return different type of struct called tm
+    // this tm stores data about the calendar date
+
+    struct tm date = *localtime(&t);
+    printf("on: %d-%02d-%02d at: %02dh:%02dmin:%02dsec\n", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
+}
+
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
 {
