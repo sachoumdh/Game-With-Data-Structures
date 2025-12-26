@@ -381,7 +381,16 @@ Game GameRound( GameState *g , Player P1 , Player P2){
         }
         turn++;
             }
+    
+        printf("  \n"); // for space
         printf("Game Results !! \n ");
+
+        printf("  \n"); // for space
+        printf("The game ended ");
+        Display_Time();
+
+        printf("  \n"); // for space
+    
             if (game.score_P1 > game.score_P2) {
                 printf(" THE WINNER IS : %s (P%d)\n ", P1.name, P1.num);
                 printf(" Score: %s %d - %d %s\n ",P1.name, game.score_P1, game.score_P2, P2.name);
