@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+ 
 
 //*******************  THE STRUCTURES  *****************//
 
@@ -16,7 +17,7 @@ typedef struct Player{
 
 typedef struct Game{
     int num_game;
-    char name_P1 [20];  
+    char name_P1 [20];
     char name_P2 [20];
     int score_P1 , score_P2;
 } Game;
@@ -52,6 +53,7 @@ typedef struct GameState{
     int totalPlayers; //total Players of the game
 }GameState;
 
+
 //*******************  THE PRIMITIVES  *****************//
 
 // ===== Primitive 1: Initialization of the queue ====
@@ -72,6 +74,7 @@ bool EmptyQueue (Queue F)
     {
         return false;
     }
+
 }
 
 // ===== Primitive 3: Adding an element to the queue (at the end) ====
@@ -119,7 +122,6 @@ bool DeQueue (Queue *F , Player *P)
 {
     if(F->Head == NULL) // Empty queue
     {
-        printf("Error: queue is empty\n");
         return false;
     }
 
@@ -168,22 +170,12 @@ void Display_Queue (Queue F)
 
     while(temp != NULL)
     {
-        // The display is as follows: [ num_Player | name_Player ]
-        printf("[ %d | %s ] -> ",temp->P.num, temp->P.name);
+        printf("Player: %s\n", temp->P.name);
         temp = temp->Pnext; // move to the next element
     }
-
-    // Print NULL at the end of the queue
-    printf("NULL\n");
 }
 
-// Function to initialise List
-void Init_List(List *L){
-    L->L = NULL;
-}
-
-//*********** Game Logic Functions *************//
-
+//***********Game Logic Functions*************//
 void ADDtoLG(List *LG , Player player){
     //Allocate new node and fill it with player
     Node *new = malloc(sizeof(Node));
@@ -220,7 +212,7 @@ bool HasTwoPlayers(Queue F) {
     return (F.Head->Pnext != NULL);
 }
 
-// Function that returns whether there are two players available and chooses them according to Queue priorities
+//function that returns whether there are two players available and chooses them according to Queue priorities
 bool Priority(GameState *g , Player *P1 , Player *P2){
     
     //First Check if we have a current winner
@@ -309,7 +301,6 @@ bool Priority(GameState *g , Player *P1 , Player *P2){
     return false;
 }
 
-
 int PlayTurn(int PlayerID , char *PlayerName){
     int r = rand() % 1000000; // generate random number from 0 to 999999
     printf("You have generated the value : %d ." , r);
@@ -332,6 +323,8 @@ int PlayTurn(int PlayerID , char *PlayerName){
     return point;
 }
 
+//*******************  LOGIC GAME 2ND PART *****************//
+
 // Recursive function that calculates the GCD of two numbers
 int GCD (int a , int b)
 {
@@ -344,6 +337,7 @@ int GCD (int a , int b)
         return GCD(b, a%b);
     }
 }
+
 
 // Function that checks if the number contains a digit
 bool number_contains_digit (int number, int digit)
@@ -360,6 +354,7 @@ bool number_contains_digit (int number, int digit)
 
     return false;
 }
+
 
 // Function to start the second strategy
 int PlayTurn2(int PlayerID , char *PlayerName)
@@ -416,7 +411,6 @@ void Display_Time ()
     printf("on: %d-%02d-%02d at: %02dh:%02dmin:%02dsec\n", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
 }
 
-//Function that runs a game round and stores the returned game
 Game GameRound( GameState *g , Player P1 , Player P2){
     //Start a game round
     Game game;
@@ -430,6 +424,7 @@ Game GameRound( GameState *g , Player P1 , Player P2){
     P1.game_score = 0;
     P2.game_score = 0;
     
+    
     printf("\nStart of Game %d : Player %d : %s VS Player %d :%s \n", game.num_game,P1.num, P1.name , P2.num , P2.name);
     
     int turn = 1;
@@ -437,14 +432,14 @@ Game GameRound( GameState *g , Player P1 , Player P2){
     //define maxturns depending on game strategy chosen
     if (g->Strategy == 1){
         maxturns = 12;
-    } else{  // We display time for strat 2
+    } else{
         maxturns = 16;
         printf("\nStarting time is :");
         Display_Time();
     }
     
-    while (turn<= 12 && abs(game.score_P1 - game.score_P2) < 3) {
-        printf ("Beggining of round %d : \n " , turn);
+    while (turn<= maxturns && abs(game.score_P1 - game.score_P2) < 3) {
+        printf ("\nBeggining of round %d : \n " , turn);
         // Player 1’s turn
         printf("%s’s turn: " , P1.name);
         if ( g->Strategy == 1){
@@ -480,8 +475,7 @@ Game GameRound( GameState *g , Player P1 , Player P2){
     }
     P1.game_score = game.score_P1;
     P2.game_score = game.score_P2;
-    
-    printf("Game Results !! \n ");
+        printf("Game Results !! \n ");
             if (game.score_P1 > game.score_P2) {
                 printf("\n THE WINNER IS : %s (P%d)\n ", P1.name, P1.num);
                 printf("\n Score: %s %d - %d %s\n ",P1.name, game.score_P1, game.score_P2, P2.name);
@@ -533,8 +527,8 @@ void MovePlayer(GameState *g , Player *P){
                 }
                 return;
             }
-        // check if 3 consecutive wins
-        else if (P->nb_succ_wins >= 3){
+            // check if 3 consecutive wins
+            else if (P->nb_succ_wins >= 3){
                 printf("Winner %d , %s won 3 times in a row ! -> Goes to F1 . \n", P->num , P->name);
                 if (isCurrWinner){
                     //Move currWinner to F1
@@ -545,7 +539,7 @@ void MovePlayer(GameState *g , Player *P){
                     EnQueue(&g->F1 , *P);
                 }
                 return;
-        } else{
+            } else{
                 //The player becomes the currWinner
                 printf("Winner %d , %s becomes the curr winner and will play next round ." , P->num , P ->name);
                 if(!isCurrWinner){
@@ -560,7 +554,7 @@ void MovePlayer(GameState *g , Player *P){
                     }
                 }
             }
-   } else  { // Strategy 2 winning rules
+        } else  { // Strategy 2 winning rules
             if (P->nb_succ_wins >= 2){
                 //Player goes to LG
                 printf("Yahoo ! Winner %d , %s is a definitive winner ! -> Goes to Winners List and exempt from playing .\n", P->num,P->name);
@@ -591,11 +585,13 @@ void MovePlayer(GameState *g , Player *P){
         if (g->Strategy == 1){
                 // we check for 5 total losses first
                 if (P->nb_losses >= 5){
-                    printf("Ayyy player %d , %s is a definitive loser :( -> Goes to Losers List and exempt from playing .\n", P->num,P->name);
+                    printf("Ouch player %d , %s is a definitive loser :( -> Goes to Losers List and exempt from playing .\n", P->num,P->name);
                     if(isCurrWinner){ //the last current winner lost
                         ADDtoLP(&g->LP, *(g->currWinner)); // we move him to LP
                         free(g->currWinner);
                         g->currWinner = NULL ;
+                    } else { //not current winner
+                        ADDtoLP(&g->LP, *P);
                     }
                     return;
                 }
@@ -624,11 +620,13 @@ void MovePlayer(GameState *g , Player *P){
         } else { //Strategy 2 loser handling
             // we check for 2 total losses first
             if (P->nb_losses >= 2){
-                printf("Ayyy player %d , %s is a definitive loser :( -> Goes to Losers List and exempt from playing .\n", P->num,P->name);
+                printf("Ouch player %d , %s is a definitive loser :( -> Goes to Losers List and exempt from playing .\n", P->num,P->name);
                 if(isCurrWinner){ //the last current winner lost
                     ADDtoLP(&g->LP, *(g->currWinner)); // we move him to LP
                     free(g->currWinner);
                     g->currWinner = NULL ;
+                } else{
+                    ADDtoLP(&g->LP, *P);
                 }
                 return;
             }
@@ -646,7 +644,7 @@ void MovePlayer(GameState *g , Player *P){
     }
 }
 
-// Function to process the game round results
+//function to process the game round results
 void GameResults( GameState *g , Game game , Player *P1 , Player *P2){
     P1->game_score = game.score_P1;
     P2->game_score = game.score_P2;
@@ -660,13 +658,13 @@ void GameResults( GameState *g , Game game , Player *P1 , Player *P2){
         P1->is_winner = true ;
         P2->is_winner = false;
         
-        printf("\n\n !! Player %d , %s Wins : %d-%d \n" , P1->num , P1->name , game.score_P1 , game.score_P2);
+        printf("Player %d , %s Wins : %d-%d \n" , P1->num , P1->name , game.score_P1 , game.score_P2);
         
         //update player stats
         Update_P_Stats(P1, P2);
         
         //moving players to appropriate Lists and Queues
-        printf("\nLet's place the players !\n");
+        printf("Let's place the players !\n");
         MovePlayer(g, P1);
         MovePlayer(g, P2);
     } else if (game.score_P2 > game.score_P1){
@@ -680,7 +678,7 @@ void GameResults( GameState *g , Game game , Player *P1 , Player *P2){
         Update_P_Stats(P2, P1);
         
         //moving players to appropriate Lists and Queues
-        printf("Let's place the players !\n");
+        printf("\nLet's place the players !\n");
         MovePlayer(g, P2);
         MovePlayer(g, P1);
     } else {
@@ -710,15 +708,18 @@ void GameResults( GameState *g , Game game , Player *P1 , Player *P2){
     }
 }
 
-// Function to display state of game after round
+//function to display state of game after round
 void DisplayGameState ( GameState *g){
     printf("\n Current Game State : \n");
     
     printf("Total games played : %d | Strategy : %d \n", g->totalGames , g->Strategy);
     
     //We display the different queues
+    printf("F Queue :\n");
     Display_Queue(g->F);
+    printf("F1 Queue :\n");
     Display_Queue(g->F1);
+    printf("F3 Queue :\n");
     Display_Queue(g->F3);
     
     //Display the current Winner
@@ -730,7 +731,7 @@ void DisplayGameState ( GameState *g){
     }
     
     //Display the lists
-    printf("The winners list : \n");
+    printf("\nThe winners list : \n");
     if(g->LG.L == NULL ){
         printf("Empty List.\n");
     } else{
@@ -738,7 +739,7 @@ void DisplayGameState ( GameState *g){
         int i = 1;
         while (Q != NULL) {
             Player p = Q->P;
-            printf("%d. Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n ", i++, p.num, p.name, p.age, p.score, p.nb_wins, p.nb_losses);
+            printf("%d. Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n", i++, p.num, p.name, p.age, p.score, p.nb_wins, p.nb_losses);
             Q = Q->Pnext;
         }
     }
@@ -751,14 +752,14 @@ void DisplayGameState ( GameState *g){
         int i = 1;
         while (Q != NULL) {
             Player p = Q->P;
-            printf("%d. Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n ", i++, p.num, p.name, p.age, p.score, p.nb_wins, p.nb_losses);
+            printf("%d. Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n", i++, p.num, p.name, p.age, p.score, p.nb_wins, p.nb_losses);
             i++;
             Q = Q->Pnext;
         }
     }
 }
 
-// Function to create the initial queue F of players (to avoid keyboard input)
+//function to create the initial queue F of players (to avoid keyboard input)
 void CreateF(Queue *F , int n ){
     //field of name strings
     char *names[15] = {
@@ -782,7 +783,7 @@ void CreateF(Queue *F , int n ){
     }
 }
 
-// Function to determine whether the game ends (ends once all players in LG or LP)
+//Function to determine whether the game ends (ends once all players in LG or LP)
 bool FinishedGame(GameState *g){
     int ListedPlayers = 0; // counter
     // Compute players in LG
@@ -807,7 +808,7 @@ void DisplayTop3Winners(List LG ){
     printf("\n*drumroll Please*\n\n");
     
     if(LG.L == NULL ){ // list of winners is empty
-        printf("No winners yet ! \n");
+        printf("No winners sadly ! \n");
         return;
     }
     Node *Q = LG.L;
@@ -815,7 +816,7 @@ void DisplayTop3Winners(List LG ){
     
     while (Q != NULL && i <= 3) {
         Player p = Q->P;
-        printf("%d.Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n\n ", i+1,p.num,p.name,p.age,p.score,p.nb_wins,p.nb_losses);
+        printf("%d.Player %d, %s | Age: %d | Score: %d | Wins: %d | Losses: %d\n\n", i+1,p.num,p.name,p.age,p.score,p.nb_wins,p.nb_losses);
         Q = Q->Pnext;
         i++;
     }
@@ -830,7 +831,7 @@ void Display_N_Wins (List * LG, List * LP , int n)
     // There is no element in the list LG and LP
     if ( (LG->L == NULL) && (LP->L == NULL) )
     {
-        printf("\nThere is no player in the lists LG and LP\n");
+        printf("\nThere is no player with %d wins in the lists LG and LP\n", n);
         return;
     }
 
@@ -841,7 +842,6 @@ void Display_N_Wins (List * LG, List * LP , int n)
     while (current != NULL)
     {
         if (current->P.nb_wins > n){
-            printf("No player in LG with %d number of wins !\n", n );
             break;
         }
         else if(current->P.nb_wins == n)
@@ -858,6 +858,7 @@ void Display_N_Wins (List * LG, List * LP , int n)
     current = LP->L;
     found = 0;
     
+    printf("\nPlayers with %d win(s) in the list LP:\n", n);
     while (current != NULL)
     {
         if(current->P.nb_wins == n)
@@ -881,14 +882,14 @@ void Display_N_Losses (List * LG, List * LP , int n)
     // There is no element in the list LG and LP
     if ( (LG->L == NULL) && (LP->L == NULL) )
     {
-        printf("\nThere is no player in the lists LG and LP\n");
+        printf("\nThere is no player with %d losses in the lists LG and LP\n", n);
         return;
     }
 
     // Create pointer to browse the list without losing the head
     current = LP->L;
 
-    printf("\n\nPlayers with %d loss(es) in the list LG:\n", n);
+    printf("\nPlayers with %d loss(es) in the list LP:\n", n);
    
     while (current != NULL)
     {
@@ -907,6 +908,7 @@ void Display_N_Losses (List * LG, List * LP , int n)
 
     current = LG->L;
     found = 0;
+    printf("\nPlayers with %d loss(es) in the list LG:\n", n);
     
     while (current != NULL)
     {
@@ -918,17 +920,17 @@ void Display_N_Losses (List * LG, List * LP , int n)
         current = current->Pnext;
     }
     if (found == 0){
-        printf("No player found in LP with %d number of wins !\n", n);
+        printf("No player found in LG with %d number of wins !\n", n);
     }
 }
 
 //game loop function
 void PlayGame(GameState *g , int nbrPlayers){
-    srand(time(NULL));
+    
     
     printf("\n  Start Game  !!  \n");
     printf("Number of players : %d \n" , nbrPlayers);
-    
+   
     CreateF(&g->F , nbrPlayers);
     g->totalPlayers = nbrPlayers;
     g->currWinner = NULL;
@@ -943,14 +945,27 @@ void PlayGame(GameState *g , int nbrPlayers){
     while(!FinishedGame(g) && (!EmptyQueue(g->F) || !EmptyQueue(g->F1) || !EmptyQueue(g->F3) || g->currWinner != NULL)){
         
         if(g->totalGames>= (3*nbrPlayers)){ // Part 1 stops after 3n rounds
-            printf("\n\n !!!!!!!\n");
-            printf("Reached %d games !\n", nbrPlayers);
-            printf("END OF PART 1 !\n");
+            printf("\n\n\n   End of Part I    \n");
+            printf("Part I games played : %d", g->totalGames);
+            printf("\n!!!!!!!\n");
+            printf("\nEnded with participation of %d players !\n", nbrPlayers);
+            printf("\nLet's display Part I results !\n");
+            //Displaying players who won or lost 1 ,2 and 3 parts of the game
+            Display_N_Wins(&g->LG, &g->LP, 1);  //Display players with 1 win
+            Display_N_Wins(&g->LG, &g->LP, 2);  //Display players with 2 win
+            Display_N_Wins(&g->LG, &g->LP, 3);  //Display players with 3 win
+            printf("\n\n Losses Stats : \n");
+            Display_N_Losses(&g->LG, &g->LP, 1);
+            Display_N_Losses(&g->LG, &g->LP, 2);
+            Display_N_Losses(&g->LG, &g->LP, 3);
+            
             //Checking whether to start Part 2 aka non empty queues
             if(!EmptyQueue(g->F) || !EmptyQueue(g->F1) || !EmptyQueue(g->F3)){
-                printf("START OF PART 2 STRATEGY\n");
+                printf("\n\nSTART OF PART 2 STRATEGY\n");
                 printf("------------------------\n");
                 change_strat = true;
+                printf("\nPress 'ENTER' to start Strategy 2 game :\n");
+                getchar();
                 break;
             }
         }
@@ -985,8 +1000,8 @@ void PlayGame(GameState *g , int nbrPlayers){
             }
             break;
         }
-        printf("\n\n\n   End of Part I    \n");
-        printf("Part 1 games played : %d", g->totalGames);
+        printf("\n  End of Round    \n");
+        printf("Part 1 games played : %d\n\n", g->totalGames);
     }
     if (change_strat){
         g->Strategy = 2;
@@ -1011,11 +1026,11 @@ void PlayGame(GameState *g , int nbrPlayers){
                 //Allow interaction with user
                 printf("\n\nPress 'ENTER' for next game :\n");
                 getchar();
-                
+                Part2Games++;
             } else{  //NO players available (Priority returns False)
                 
                 if (g->currWinner != NULL){   //last player moves to F1
-                    printf("\n No opponent for current Winner %d , %s -> Player moved to F1\n" , g->currWinner->num, g->currWinner->name);
+                    printf("\n No opponent for current Winner : %d . %s -> Player moved to F1\n" , g->currWinner->num, g->currWinner->name);
                     EnQueue(&g->F1, *(g->currWinner));
                     free(g->currWinner); //free the currWinner memory
                     g->currWinner = NULL;
@@ -1024,11 +1039,13 @@ void PlayGame(GameState *g , int nbrPlayers){
                 if (!EmptyQueue(g->F3) && EmptyQueue(g->F) && EmptyQueue(g->F1) && g->currWinner == NULL){
                     Player lastPlayer;
                     DeQueue(&g->F3, &lastPlayer);
-                    printf("Last Player in F3 %d , %s -> moves to LP\n" , lastPlayer.num,lastPlayer.name);
+                    printf("Last Player in F3 : %d. %s -> moves to LP\n" , lastPlayer.num,lastPlayer.name);
                     ADDtoLP(&g->LP, lastPlayer);
                 }
                 break;
             }
+            printf("\n  End of Round    \n");
+            printf("Part 2 games played : %d\n\n", Part2Games);
             
         }
         printf("\n\n\n   End of Part II    \n");
@@ -1083,85 +1100,51 @@ void PlayGame(GameState *g , int nbrPlayers){
     Display_N_Wins(&g->LG, &g->LP, 0);  //Display players with no wins
     Display_N_Wins(&g->LG, &g->LP, 1);  //Display players with 1 win
     Display_N_Wins(&g->LG, &g->LP, 2);  //Display players with 2 win
-    Display_N_Wins(&g->LG, &g->LP, 3);  //Display players with 3 win
     printf("\n\n Losses Stats : \n");
     Display_N_Losses(&g->LG, &g->LP, 1);
     Display_N_Losses(&g->LG, &g->LP, 2);
-    Display_N_Losses(&g->LG, &g->LP, 3);
     
     printf("\n\n\n------------------------\n");
     printf("Thank you for playing our game ! :) \n");
     }
 
 
+
+void Init_List(List *L){
+    L->L = NULL;
+}
+
+
+
+
 //*******************  MAIN  *****************//
 int main(int argc, const char * argv[])
 {
-    Queue F;
-    Player P;
-
-    // Initialization of the queue F
-    Init_Queue(&F);
-
-    // Display queue test (empty queue)
-    Display_Queue(F);
-
-    // Create players
-    Player P1 = {1, 12, "Sarah", // num , age , name 
-             0, 0, 0,      // game_score, score, succesifs_points
-             2, 2,         // nb_wins, nb_losses
-             0, 1,         // nb_succ_wins, nb_succ_losses
-             false};       // is_winner
-
-    Player P2 = {2, 18, "Lyna",
-             10, 25, 3,
-             2, 1,
-             1, 0,
-             true};
-
-    Player P3 = {2, 18, "Me",
-             10, 25, 3,
-             2, 1,
-             1, 0,
-             true};
-
-    Player P4 = {2, 18, "You",
-             10, 25, 3,
-             2, 1,
-             1, 0,
-             true};
-
-    // Test EnQueue
-    EnQueue(&F, P1);
-    EnQueue(&F, P2);
-    EnQueue(&F, P3);
-    EnQueue(&F, P4);
-
-    // Display queue (players)
-    Display_Queue(F);
-
-    // Test DeQueue
-    printf("=== DeQueue ===\n");
-    while (DeQueue(&F, &P))
-    {
-        printf("The player removed is:%s\n", P.name);
-        printf("Queue state: \n");
-        Display_Queue(F); // Display queue state
-    }
-
-    GameState g;
+    //initialisation of all game structures
+    GameState g = {0};
     Init_Queue(&g.F);
     Init_Queue(&g.F1);
     Init_Queue(&g.F3);
     g.GameHistory = NULL;
     g.totalGames = 0;
     g.currWinner = NULL;
-    g.totalGames = 0;
+    g.totalPlayers = 0;
     g.Strategy = 1;
     Init_List(&g.LG);
     Init_List(&g.LP);
     
-    PlayGame(&g, 2); //2 being the total number of players
+    printf("Hi Dear Players !\nWelcome to our game , conceived by Hamdi Sarah and Djenkal Lyna\n");
+    printf("To start playing may you please enter the total number of players!!\n");
+    int Number_Players;
+    scanf("%d", &Number_Players);
+    printf("Ok ! Now I invite you to enjoy :D\n\n");
+    PlayGame(&g, Number_Players);
 
     return 0;
 }
+
+
+
+
+
+
