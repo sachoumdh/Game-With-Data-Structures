@@ -43,3 +43,15 @@ Players are moved between structures according to their performance:
 - Loser → F3
 - 2 wins → LG
 - 2 losses → LP
+
+## 👥 Development Team 
+HAMDI Sarah 
+DJENKAL Lyna 
+
+Academic Supervisor : S.Boukhedouma
+
+## 📅 Academic Year 
+2025-2026 | University of Science and Technology Houari Boumediene (USTHB)
+
+## 📄 License 
+This project was developed for educational purposes as part of an end of semester assignement 
